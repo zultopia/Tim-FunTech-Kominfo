@@ -1,3 +1,4 @@
+// App.tsx
 import './App.css';
 import kominfoLogo from '/logo.png'; 
 import FormInput from './components/FormInput';
@@ -14,7 +15,7 @@ function App() {
     penghasilan: '',
   });
 
-  const [predictedKurs, setPredictedKurs] = useState<number | null>(null); 
+  const [result, setResult] = useState<{ predictedKurs: number; r2Score: number; mae: number } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -33,7 +34,11 @@ function App() {
 
     if (response.ok) {
       const result = await response.json();
-      setPredictedKurs(result.predicted_kurs);
+      setResult({
+        predictedKurs: result.predicted_kurs,
+        r2Score: result.r2_score,
+        mae: result.mae
+      });
     } else {
       alert('Error fetching prediction');
     }
@@ -56,11 +61,13 @@ function App() {
             <button type="submit">Hitung Kurs</button>
           </form>
         </div>
-        {predictedKurs !== null && (
+        {result && (
           <div className="result-container">
             <h2 className="result-title">Hasil Prediksi:</h2>
             <div className="result">
-              <h3>{predictedKurs.toFixed(2)} IDR</h3>
+              <h3>{result.predictedKurs.toFixed(2)} IDR</h3>
+              <p>R²: {result.r2Score.toFixed(4)}</p>
+              <p>MAE: {result.mae.toFixed(4)}</p>
             </div>
           </div>
         )}

@@ -1,7 +1,7 @@
 # backend/app.py
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from model import predict_kurs
+from model import predict_kurs, evaluate_model
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -24,8 +24,12 @@ def predict():
     except (ValueError, KeyError) as e:
         return jsonify({'error': 'Invalid input data'}), 400
     
-    prediction = predict_kurs(user_input)
-    return jsonify({'predicted_kurs': prediction[0]})
+    prediction, r2, mae = predict_kurs(user_input)
+    return jsonify({
+        'predicted_kurs': prediction[0],
+        'r2_score': r2,
+        'mae': mae
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)
